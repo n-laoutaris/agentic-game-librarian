@@ -1,0 +1,71 @@
+{
+  "profile_version": 1,
+  "user_id": "demo_user_001",
+  "created_at": "2026-04-01T12:00:00Z",
+  "last_updated_at": "2026-05-04T10:30:00Z",
+  "persona": {
+    "preferred_play_style": ["cozy", "exploration", "sandbox", "strategic", "creative"],
+    "favorite_themes": ["fantasy", "nature", "whimsy", "exploration", "creativity"],
+    "disliked_themes": ["intense competition", "time pressure", "violence-focused", "pay-to-win"]
+  },
+  "pc_build": {
+    "cpu": "AMD Ryzen 7 5700X",
+    "gpu": "Nvidia GeForce RTX 3070 Ti",
+    "ram_gb": 32,
+    "storage": {
+      "ssd_gb": 2000,
+      "hdd_gb": null
+    },
+    "os": "Windows 11 Home",
+    "display": {
+      "resolution": "3440x1440",
+      "refresh_rate_hz": 144
+    },
+    "input_devices": ["keyboard", "mouse", "controller"],
+    "performance_profile": "balanced with preference for 100+ FPS",
+    "upgrade_plans": {
+      "next_component": "GPU",
+      "budget_usd": 1200
+    }
+  },
+  "favorite_games": [
+    {
+      "source_id": "steam:413150",
+      "title": "Stardew Valley",
+      "favorite_reason": "Relaxing gameplay with deep character building and exploration mechanics",
+      "tags": ["cozy", "farming", "sandbox", "relaxing"],
+      "strength": 0.95,
+      "last_played_at": "2026-05-02T19:30:00Z"
+    },
+    {
+      "source_id": "steam:367520",
+      "title": "Hollow Knight",
+      "favorite_reason": "Beautiful pixel art with challenging exploration and intricate world design",
+      "tags": ["metroidvania", "exploration", "challenging", "art"],
+      "strength": 0.88,
+      "last_played_at": "2026-04-28T15:00:00Z"
+    },
+    {
+      "source_id": "steam:1651490",
+      "title": "Minecraft",
+      "favorite_reason": "Ultimate sandbox freedom for creative building and exploration",
+      "tags": ["sandbox", "creative", "multiplayer", "exploration"],
+      "strength": 0.92,
+      "last_played_at": "2026-05-01T20:00:00Z"
+    }
+  ],
+  "gaming_habits": {
+    "average_session_length_minutes": 90,
+    "preferred_play_times": ["evenings", "weekends"],
+    "multiplayer_preference": "co-op focused, avoid competitive ranked modes",
+    "difficulty_preference": "adaptive - challenging but not punishing"
+  },
+  "experience_notes": [
+    {
+      "note_id": "onboarding-completion-20260404-140500",
+      "created_at": "2026-04-04T14:05:00Z",
+      "summary": "User completed onboarding workflow",
+      "details": "Profile initialized with gaming preferences. User indicated preference for cozy, exploration-focused games with strong narrative or creative elements."
+    }
+  ]
+}
