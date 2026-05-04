@@ -1,0 +1,29 @@
+# Environment variables with real credentials
+.env
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Real user data (keep .example files)
+database/library.json
+database/user_profile.json
+database/raw_steam.json
+
+# Project build related temporary files
+memory-bank/projectbrief.md
+memory-bank/activeContext.md
