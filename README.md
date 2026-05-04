@@ -24,6 +24,7 @@ Built on the **agentskills.io** framework.
 
 ## Core Architecture 
 
+```mermaid
 graph TD
     %% Define styles
     classDef agent fill:#f9f2f4,stroke:#333,stroke-width:2px;
@@ -55,7 +56,7 @@ graph TD
     Master -.->|Reads Facts| Agent
     Profile -.->|Reads Context| Agent
     Agent -->|Contextual Recommendation| User
-    
+```
     
 ## Getting Started
 
