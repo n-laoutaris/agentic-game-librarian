@@ -1,6 +1,17 @@
 # Environment variables with real credentials
 .env
 
+# Real user data, personal library
+database/playnite_export.csv
+database/library.json
+
+# User profiles and personalization
+database/user_profile.json
+
+# Project build related temporary files
+memory-bank/projectbrief.md
+memory-bank/activeContext.md
+
 # Python
 __pycache__/
 *.py[cod]
@@ -23,7 +34,3 @@ ENV/
 database/library.json
 database/user_profile.json
 database/raw_steam.json
-
-# Project build related temporary files
-memory-bank/projectbrief.md
-memory-bank/activeContext.md

@@ -19,7 +19,7 @@ An Agentic AI application that acts as a personal librarian with direct access t
 Built on the **agentskills.io** framework.
 
 - **Autonomous Onboarding**: Conducts an interview to build a user persona (hardware specs, session lengths, thematic preferences).
-- **ETL Pipeline** (`update-library`): A Python-driven Extract, Transform, Load pipeline that diffs my local library against storefront exports and enriches new titles via the IGDB API.
+- **Update Library Skill**: An ETL pipeline that reads Playnite's multi-store CSV export and transforms it into a clean file, enriched with full metadata.
 - **Agentic Reasoning**: Synthesizes my library data with my current mood to explain why a specific game matches my exact context today.
 
 ## Core Architecture 
@@ -30,39 +30,40 @@ graph TD
     classDef agent fill:#f9f2f4,stroke:#333,stroke-width:2px;
     classDef python fill:#e8f4f8,stroke:#333,stroke-width:1px;
     classDef db fill:#f4f9f4,stroke:#333,stroke-width:1px;
+    classDef external fill:#fff8e8,stroke:#333,stroke-width:1px;
     
     %% Nodes
     User([User])
     Agent{LLM Agent}:::agent
+    Playnite[Playnite Multi-Store\nExport]:::external
     
-    subgraph Python ETL Pipeline
-        Fetch[Phase 1: Fetch Raw Store Data]:::python
-        Diff[Phase 2: Diff vs Local Library]:::python
-        Enrich[Phase 3: Enrich with Metadata]:::python
-    end
+
+    Normalize[Normalize CSV: Clean HTML, Parse Dates, Array Fields, Convert Times]:::python
+
     
     subgraph Database State
-        Master[(library.json)]:::db
-        Profile[(user_profile.json)]:::db
+        Master[(Enriched Library)]:::db
+        Profile[(User Profile)]:::db
     end
 
     %% Flow
     User -->|Prompt: What should I play?| Agent
-    Agent -->|Triggers Skill| Fetch
-    Fetch --> Diff
-    Diff -->|Identifies New Games| Enrich
-    Enrich -->|Appends Enriched Data| Master
+    Playnite -->|Auto-Export| Normalize
+    Normalize -->|Transforms & Cleans| Master
     
-    Master -.->|Reads Facts| Agent
-    Profile -.->|Reads Context| Agent
+    Agent -->|Triggers Library Sync| Normalize
+    Master -.->|Reads Context| Agent
+    Profile -.->|Reads Preferences| Agent
     Agent -->|Contextual Recommendation| User
 ```
-    
+
+Initial architecture used custom Python ETL scripts querying the IGDB API. However, the pipeline was refactored to use Playnite as an automated background ETL agent, reducing custom codebase size by 60% while maintaining identical data output.
+
 ## Getting Started
 
 ### 1. Environment Setup
 
-Clone the repository, set up your environment variables, and install dependencies. Edit .env with your Steam and Twitch/IGDB developer credentials.
+Clone the repository, and install dependencies. This project assumes the user already has Playnite installed and set up, with its library file exported in the project folder.
 
 ### 2. Run the Agent
 
@@ -70,7 +71,6 @@ Start an interactive session using an Agentic framework of your choice (e.g., Cl
 
 ## Future Work
 
-- **Automated Storefront Integration**: Replace the manual custom Python scrapers with a Playnite automated JSON export. This will unify all store libraries into a single background sync, reducing the custom codebase footprint while expanding platform coverage.
 - **Recommendation Skill**: Add a dedicated skill for explicit instructions when generating personalized game recommendations.
 - **Linux Support**: Linux gaming is a thing now. Add OS-awareness to the onboarding skill to filter recommendations based on ProtonDB compatibility for Linux/Steam Deck users.
-- **Deep Metadata Enrichment**: Integrate more APIs for richer metadata, such as the Co-Optimus API (for exact local/online player counts) or HowLongToBeat (for session planning).
+- **Deep Metadata Enrichment**: Integrate APIs for richer metadata, such as the Co-Optimus API (for exact local/online player counts) or HowLongToBeat (for session planning).

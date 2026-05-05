@@ -1,3 +1,12 @@
+"""DEPRECATED: This script is no longer used.
+
+The update-library skill now uses Playnite's multi-store export instead of the Steam API.
+See normalize_playnite_export.py for the current implementation.
+
+Reason: Playnite provides richer metadata across all game storefronts (Steam, Epic, GOG, Xbox, etc.)
+without requiring API key management or multiple external API calls.
+"""
+
 import json
 import os
 from pathlib import Path

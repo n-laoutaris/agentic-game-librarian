@@ -1,3 +1,12 @@
+"""DEPRECATED: This script is no longer used.
+
+The update-library skill now uses Playnite's rich metadata export directly.
+Metadata enrichment from IGDB is no longer necessary since Playnite already
+provides developers, genres, descriptions, tags, release dates, and scores.
+
+See normalize_playnite_export.py for the current implementation.
+"""
+
 import json
 import os
 from pathlib import Path

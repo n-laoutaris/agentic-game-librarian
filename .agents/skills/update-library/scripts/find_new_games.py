@@ -1,3 +1,12 @@
+"""DEPRECATED: This script is no longer used.
+
+The update-library skill now uses Playnite's multi-store export instead of a multi-phase
+fetch/diff/enrich pipeline. Diffing is no longer necessary since Playnite provides
+the complete library in a single export.
+
+See normalize_playnite_export.py for the current implementation.
+"""
+
 import json
 from pathlib import Path
 

@@ -1,104 +1,177 @@
 ---
 name: update-library
-description: Phases 1-3 - Fetches owned games from Steam, identifies new titles, and enriches with IGDB metadata
+description: Loads and normalizes Playnite multi-store export into enriched library.json
 ---
 
-# Update Library Skill - Phases 1-3 (Fetch, Diff, & Enrich)
-
-This skill handles the complete library update process: fetching owned games from Steam, identifying new titles, and enriching them with metadata from IGDB.
+This skill handles the complete library update process: loading Playnite's multi-store export and normalizing it into a clean, enriched library format ready for agent recommendations.
 
 ## Execution Steps
 
-When running this skill, execute the following in order:
+When running this skill, execute the following:
 
-1. **Fetch Steam Games**: Run the Steam fetch script to query your owned games from the Steam API
-   - Script: `scripts/fetch_steam_owned_games.py`
-   - Output: `database/raw_steam.json`
-   - Format: Array of objects with `title`, `platform` (Steam), `source_id` (Steam App ID), and `playtime_hours` (converted from minutes)
+1. **Normalize Playnite Export**: Run the normalization script to clean and transform the raw Playnite CSV
+   - Script: `scripts/normalize_playnite_export.py`
+   - Input: `database/playnite_export.csv` (automatically maintained by Playnite)
+   - Output: `database/library.json` (enriched multi-store catalog)
+   - Time: ~1-2 seconds for typical libraries (no external API calls)
 
-2. **Find New Games**: Compare raw games against the master library to identify which titles need metadata
-   - Script: `scripts/find_new_games.py`
-   - Inputs: `database/raw_steam.json` and `database/library.json`
-   - Output: `database/needs_metadata.json`
-   - Logic: Compares by `source_id` only; all raw games are considered new if master library is empty
-   - Format: Same as raw_steam.json - objects with `title`, `platform`, `source_id`, and `playtime_hours`
+## Data Transformations
 
-3. **Fetch Metadata**: Enrich new games with metadata from IGDB via Twitch OAuth2 authentication
-   - Script: `scripts/fetch_metadata.py`
-   - Inputs: `database/needs_metadata.json` and `database/library.json`
-   - Outputs: Updated `database/library.json` and emptied `database/needs_metadata.json`
-   - Authentication: Requires `TWITCH_CLIENT_ID` and `TWITCH_CLIENT_SECRET` in `user_config.json`
-   - Per-game: Fetches name, summary, genres, themes, game modes, player perspectives, keywords, rating, and companies from IGDB
-   - Format: Enriched objects combining store data with IGDB metadata
+The normalization script performs the following transformations:
 
-The complete pipeline enriches your library with comprehensive game metadata on each run.
+### Input: Playnite CSV Columns
+```
+Name, Description, Developers, Features, Genres, Release Date, 
+Completion Status, Time Played, Sources, Tags, Community Score, Critic Score, Id
+```
+
+### Output: Enriched library.json Schema
+
+Each game entry in `database/library.json` contains:
+
+```json
+{
+  "id": "771147b7-ca35-4264-8389-ae0ccd86f469",
+  "title": "10 Second Ninja X",
+  "description": "Clean plain text without HTML tags",
+  "developers": ["Four Circle Interactive"],
+  "genres": ["Arcade", "Fighting", "Indie", "Platform", "Puzzle"],
+  "features": ["Single Player"],
+  "tags": ["2D", "2D Platformer", "Action", "Arcade", "Casual", "Difficult"],
+  "release_date": "2016-07-19",
+  "completion_status": "Not Played",
+  "time_played_hours": 45.5,
+  "sources": ["Steam"],
+  "community_score": 65,
+  "critic_score": 77
+}
+```
+
+### Transformation Details
+
+| Field | Transformation |
+|-------|---|
+| **Id** | Kept as-is (Playnite UUID serves as primary key) |
+| **Name** | Trimmed whitespace → title |
+| **Description** | HTML tags stripped, entities decoded, whitespace normalized |
+| **Developers** | Comma-separated string → array of strings |
+| **Genres** | Comma-separated string → array of strings |
+| **Features** | Comma-separated string → array of strings |
+| **Tags** | Comma-separated string → array of strings |
+| **Release Date** | Multiple formats normalized to ISO (YYYY-MM-DD) |
+| **Completion Status** | Preserved as-is or null if empty |
+| **Time Played** | Converted to float hours (handles "45 mins", "1.5h", etc.) |
+| **Sources** | Comma-separated string → array (e.g., ["Steam"], ["Steam", "Epic"]) |
+| **Community Score** | Empty → null, otherwise parsed as integer |
+| **Critic Score** | Empty → null, otherwise parsed as integer |
+
+### Data Cleaning Features
+
+1. **HTML Stripping**: Removes all HTML tags and script content from descriptions, preserves text
+2. **Entity Decoding**: Converts `&quot;`, `&amp;`, etc. to readable characters
+3. **Time Format Handling**:
+   - `"0"` → `0.0` hours
+   - `"45 mins"` → `0.75` hours
+   - `"1.5"` → `1.5` hours
+   - Empty → `0.0` hours
+4. **Date Normalization**:
+   - Supports: `19/7/2016`, `2016-07-19`, `07/19/2016`, `2016/7/19`, `2016` (year only)
+   - Output: ISO format `YYYY-MM-DD` or `null`
+5. **Graceful Null Handling**: Empty fields become `null` in JSON, arrays default to `[]`
+
+## Running the Skill
+
+### Manual Execution
+
+```powershell
+# From the project root (PowerShell):
+$env:PYTHONIOENCODING="utf-8"; & "c:\programdata\anaconda3\python.exe" ".agents\skills\update-library\scripts\normalize_playnite_export.py"
+
+# Or from bash:
+python .agents/skills/update-library/scripts/normalize_playnite_export.py
+```
+
+**Note**: The script handles BOM-encoded CSV files automatically (uses `encoding="utf-8-sig"`), so Playnite exports are processed correctly.
+
+### From the Agent
+
+Invoke with:
+```
+Update my game library from Playnite
+Run the update-library skill
+Sync my library
+```
+
+The agent will execute the normalization and provide a summary (e.g., "Normalized 247 games, 3 skipped").
 
 ## Important Notes
 
-### Metadata Completeness
-- IGDB returns results for ~93% of games in a typical Steam library
-- Games without IGDB matches are still added to the library with store data (title, platform, source_id, playtime_hours)
-- Some IGDB records may have incomplete fields (e.g., null summary or rating) - these are preserved as-is
-- Special characters in game titles (®, ™, etc.) are handled by the search and don't prevent enrichment
+### Multi-Store Support
 
-### Incremental Updates
-- Running the pipeline multiple times is safe - it will only enrich new games not already in library.json
-- Comparison is done by source_id, so updating playtime_hours on Steam will preserve existing IGDB metadata
+Games appearing on multiple storefronts (e.g., same game on both Steam and Epic) will appear as separate entries with different `sources` arrays. This preserves:
+- Per-store achievements and stats
+- Platform-specific install locations
+- Store-specific ratings and reviews
+
+### CSV Export Setup (Playnite)
+
+1. Install [Playnite](https://playnite.link/)
+2. Import your libraries (Steam, Epic, GOG, Xbox, etc.)
+3. Configure auto-export in Playnite settings:
+   - Path: `<project>/database/playnite_export.csv`
+   - Format: CSV
+   - Frequency: On library change (automatic)
+
+The normalization script will pick up changes automatically.
+
+### Performance
+
+- Reading CSV: ~0.1-0.5 seconds (depending on library size)
+- Transformations: ~1-2 seconds for typical libraries (200-500 games)
+- Writing JSON: ~0.5 seconds
+- **Total**: ~2-3 seconds (no waiting for external APIs!)
+
+### Error Handling
+
+The normalization script:
+- Logs skipped rows with reasons
+- Continues processing on minor errors (graceful degradation)
+- Validates all required fields (title, id)
+- Reports summary statistics at completion
+
+If a game fails to normalize, it's logged and skipped—the rest of the library proceeds normally.
 
 ## Output Formats
 
-### raw_steam.json (Phase 1 Output)
+### library.json Structure
 
-The `database/raw_steam.json` file contains all owned games:
-
-```json
-[
-  {
-    "title": "Game Title",
-    "platform": "Steam",
-    "source_id": 123456,
-    "playtime_hours": 42.5
-  }
-]
-```
-
-### needs_metadata.json (Phase 2 Output)
-
-The `database/needs_metadata.json` file contains only games not yet in the master library:
+The output `database/library.json` is an array of game objects, one per game:
 
 ```json
 [
-  {
-    "title": "New Game Title",
-    "platform": "Steam",
-    "source_id": 987654,
-    "playtime_hours": 5.25
-  }
+  { game 1 with all fields... },
+  { game 2 with all fields... },
+  { game N... }
 ]
 ```
 
-### library.json (Phase 3 Output)
+**Total size**: Typically 10-30 MB for large libraries (readable, human-friendly format)
 
-The `database/library.json` file contains enriched games with both store and metadata:
+## Backward Compatibility
 
-```json
-[
-  {
-    "title": "Game Title",
-    "platform": "Steam",
-    "source_id": 123456,
-    "playtime_hours": 42.5,
-    "igdb_id": 9876,
-    "summary": "An engaging game about...",
-    "genres": ["Action", "Adventure"],
-    "themes": ["Fantasy", "Open World"],
-    "game_modes": ["Single Player", "Multiplayer"],
-    "player_perspectives": ["Third Person"],
-    "keywords": ["Open World", "Exploration"],
-    "total_rating": 87.5,
-    "involved_companies": ["Developer Inc.", "Publisher LLC"]
-  }
-]
-```
+If you have a legacy library setup:
+- Old scripts (`fetch_steam_owned_games.py`, `find_new_games.py`, `fetch_metadata.py`) are deprecated but preserved
+- They're marked with deprecation notices
+- Don't use them; use Playnite export instead
 
-This enriched master library is the final output ready for your gaming library application.
+To migrate from Steam API to Playnite:
+1. Install Playnite and import your Steam library
+2. Configure auto-export to `database/playnite_export.csv`
+3. Run `normalize_playnite_export.py`
+4. Delete old intermediate files (raw_steam.json, needs_metadata.json)
+
+Done! Your library.json now contains multi-store data with no API management.
+
+---
+
+**Next Steps**: Use the enriched `library.json` with the agent's recommendation and analysis skills.
