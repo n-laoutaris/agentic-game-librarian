@@ -30,3 +30,4 @@ ENV/
 database/library.json
 database/user_profile.json
 database/raw_steam.json
+database/taxonomy.json
