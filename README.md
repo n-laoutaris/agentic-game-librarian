@@ -18,9 +18,9 @@ An Agentic AI application that acts as a personal librarian with direct access t
 
 Built on the **agentskills.io** framework.
 
-- **Autonomous Onboarding**: Conducts an interview to build a user persona (hardware specs, session lengths, thematic preferences).
+- **Update Profile Skill**: Initializes user profiles on first-run and refines preferences on subsequent interactions. Collects PC hardware facts, play styles, and mood-based preferences through conversational reasoning.
 - **Update Library Skill**: An ETL pipeline that reads Playnite's multi-store CSV export and transforms it into a clean file, enriched with full metadata.
-- **Agentic Reasoning**: Synthesizes my library data with my current mood to explain why a specific game matches my exact context today.
+- **Agentic Reasoning**: Synthesizes library data with current mood to explain why a specific game matches your exact context today.
 
 ## Core Architecture 
 
@@ -67,10 +67,10 @@ Clone the repository, and install dependencies. This project assumes the user al
 
 ### 2. Run the Agent
 
-Start an interactive session using an Agentic framework of your choice (e.g., Cline, Copilot). The agent will automatically trigger the onboarding interview (if no profile is found), execute the ETL pipeline to sync your games, then open a conversational loop for recommendations.
+Start an interactive session using an Agentic framework of your choice (e.g., Cline, Copilot). The agent will automatically trigger the profile update skill (initializing your profile if empty), execute the ETL pipeline to sync your games, then open a conversational loop for recommendations.
 
 ## Future Work
 
 - **Recommendation Skill**: Add a dedicated skill for explicit instructions when generating personalized game recommendations.
-- **Linux Support**: Linux gaming is a thing now. Add OS-awareness to the onboarding skill to filter recommendations based on ProtonDB compatibility for Linux/Steam Deck users.
+- **Linux Support**: Linux gaming is a thing now. Add OS-awareness to the update-profile skill to filter recommendations based on ProtonDB compatibility for Linux/Steam Deck users.
 - **Deep Metadata Enrichment**: Integrate APIs for richer metadata, such as the Co-Optimus API (for exact local/online player counts) or HowLongToBeat (for session planning).

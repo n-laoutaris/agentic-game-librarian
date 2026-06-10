@@ -8,10 +8,6 @@ database/library.json
 # User profiles and personalization
 database/user_profile.json
 
-# Project build related temporary files
-memory-bank/projectbrief.md
-memory-bank/activeContext.md
-
 # Python
 __pycache__/
 *.py[cod]
