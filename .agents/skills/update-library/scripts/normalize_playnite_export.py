@@ -84,6 +84,7 @@ def parse_time_played(time_str):
     - "0" or empty → 0.0
     - "45 mins" → 0.75
     - "1.5" → 1.5
+    - "7200" → 2.0 (Playnite exports raw seconds as a bare number)
     - "10:30:45" (HH:MM:SS) → 10.5125
     """
     if not time_str or not isinstance(time_str, str):
@@ -111,7 +112,15 @@ def parse_time_played(time_str):
         except (AttributeError, ValueError):
             return 0.0
     
-    # Direct number (assume hours)
+    # Bare numbers from Playnite export are raw seconds, not hours.
+    if time_str.isdigit():
+        try:
+            seconds = int(time_str)
+            return round(seconds / 3600, 2)
+        except ValueError:
+            return 0.0
+    
+    # Decimal numbers with no units are treated as hours.
     try:
         return round(float(time_str), 2)
     except ValueError:
