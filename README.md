@@ -59,16 +59,6 @@ graph TD
 
 Initial architecture used custom Python ETL scripts querying the IGDB API. However, the pipeline was refactored to use Playnite as an automated background ETL agent, reducing custom codebase size by 60% while maintaining identical data output.
 
-## Getting Started
-
-### 1. Environment Setup
-
-Clone the repository, and install dependencies. This project assumes the user already has Playnite installed and set up, with its library file exported in the project folder.
-
-### 2. Run the Agent
-
-Start an interactive session using an Agentic framework of your choice (e.g., Cline, Copilot). The agent will automatically trigger the profile update skill (initializing your profile if empty), execute the ETL pipeline to sync your games, then open a conversational loop for recommendations.
-
 ## Future Work
 
 - **Recommendation Skill**: Add a dedicated skill for explicit instructions when generating personalized game recommendations.
