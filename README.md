@@ -18,9 +18,8 @@ An Agentic AI application that acts as a personal librarian with direct access t
 
 Built on the **agentskills.io** framework.
 
-- **Update Profile Skill**: Initializes user profiles on first-run and refines preferences on subsequent interactions. Collects PC hardware facts, play styles, and mood-based preferences through conversational reasoning.
 - **Update Library Skill**: An ETL pipeline that reads Playnite's multi-store CSV export and transforms it into a clean file, enriched with full metadata. Includes taxonomy extraction to catalog all available genres, tags, and features.
-- **Recommend Game Skill**: Interprets user mood and constructs intelligent filter queries against the library using the universal `--filter` interface (e.g., `--filter genre:RPG,Adventure`). Uses profile affinity signals to select and explain top recommendations.
+- **Recommend Game Skill**: Interprets user mood and constructs intelligent filter queries against the library using the universal `--filter` interface (e.g., `--filter genre:RPG,Adventure`). Ranks recommendations using stored hardware constraints and preference memory.
 
 ## Core Architecture 
 
@@ -62,6 +61,6 @@ Initial architecture used custom Python ETL scripts querying the IGDB API. Howev
 ## Future Work
 
 - **Profile-Aware Scoring**: Add optional relevance scoring to `filter_games.py` for agent-driven ranking without external API calls.
-- **Linux Support**: Linux gaming is a thing now. Add OS-awareness to the update-profile skill to filter recommendations based on ProtonDB compatibility for Linux/Steam Deck users.
+- **Linux Support**: Linux gaming is a thing now. Add ProtonDB compatibility detection to filter recommendations for Linux/Steam Deck users.
 - **Deep Metadata Enrichment**: Integrate APIs for richer metadata, such as the Co-Optimus API (for exact local/online player counts) or HowLongToBeat (for session planning).
 - **Mood Tracking**: Track recommendation patterns over time to identify seasonal preferences and improve future suggestions.
