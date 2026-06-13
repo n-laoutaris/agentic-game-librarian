@@ -20,7 +20,7 @@ Built on the **agentskills.io** framework.
 
 - **Update Profile Skill**: Initializes user profiles on first-run and refines preferences on subsequent interactions. Collects PC hardware facts, play styles, and mood-based preferences through conversational reasoning.
 - **Update Library Skill**: An ETL pipeline that reads Playnite's multi-store CSV export and transforms it into a clean file, enriched with full metadata. Includes taxonomy extraction to catalog all available genres, tags, and features.
-- **Recommend Game Skill**: Interprets user mood and constructs intelligent boolean filter queries against the library. Uses profile affinity scoring to rank recommendations by backlog priority, genre fit, and similarity to top-played games. Returns contextual game suggestions with reasoning tied to mood and gaming profile.
+- **Recommend Game Skill**: Interprets user mood and constructs intelligent filter queries against the library using the universal `--filter` interface (e.g., `--filter genre:RPG,Adventure`). Uses profile affinity signals to select and explain top recommendations.
 
 ## Core Architecture 
 
