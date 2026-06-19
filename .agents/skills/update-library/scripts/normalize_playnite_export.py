@@ -227,7 +227,7 @@ def load_and_normalize_playnite():
                 
                 if game:
                     games.append(game)
-                    print(f"  [{i}] ✓ {game['title']}")
+                    # print(f"  [{i}] ✓ {game['title']}")
                 else:
                     skipped += 1
                     title = row.get("Name", f"Row {i}")
